@@ -1,10 +1,12 @@
 void enableLowPower(){
-  power_twi_disable();      // Disable TWI
+ 
   ADCSRA = 0;               // Turn of ADC
+  ACSR |= _BV(ACD);    // Disable analog comparator
   wdt_disable();            // Disable Watchdog Timer
   power_timer1_disable();               // Disable Timer1
   power_timer2_disable();
   power_timer3_disable();
+  power_twi_disable();      // Disable I2C
   //power_usart0_disable();
   //power_usart1_disable();
  
@@ -16,8 +18,8 @@ void enableLowPowerNoSerial(){
     vTaskSuspend(readSerialHandle);
     listenSerialActive = false;  
     Serial.end();
-    power_timer2_disable();
-    power_timer3_disable();
+    //power_timer2_disable();
+    //power_timer3_disable();
     //power_usb_disable();  //FIXME: Uncomment for final version!
 
     //USBCON |= (1 << FRZCLK);              // Freeze the USB Clock              
