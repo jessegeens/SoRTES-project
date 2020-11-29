@@ -6,6 +6,7 @@
 #include <semphr.h>
 #include <avr/sleep.h>
 #include <avr/power.h>
+#include <avr/wdt.h>
 
 
 /* * * * * * * * * * * * * * * * * * 
@@ -38,7 +39,7 @@ typedef struct {
 EDB db(&writer, &reader); // Create an EDB object with the appropriate write and read handlers
 
 int beaconCount = 0; // Keep track of received number of beacons
-int numberOfBeacons = 5;
+int numberOfBeacons = 3;
 
 const byte interruptPin = 2;
 volatile byte state = LOW;
@@ -94,9 +95,9 @@ void setup() {
   receiveQueue = xQueueCreate(2, sizeof(int));
 
   // Power mgmt setup
-  pinMode(interruptPin, INPUT_PULLUP);
+  //pinMode(interruptPin, INPUT_PULLUP);
   //attachInterrupt(digitalPinToInterrupt(interruptPin), wakeUpFromDeepSleep, CHANGE);
-  enableLowPower();
+  //enableLowPower();
 
   
   // Create database
@@ -106,6 +107,7 @@ void setup() {
   // Discard first temperature read
   adc_read_temp();
   delay(2000);
+  
   // Setup LoRa
   LoRa.setPins(SS,RST,DI0);
   if (!LoRa.begin(BAND,PABOOST )) {

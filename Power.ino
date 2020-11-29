@@ -18,22 +18,22 @@ void enableLowPowerNoSerial(){
     vTaskSuspend(readSerialHandle);
     listenSerialActive = false;  
     Serial.end();
-    //power_timer2_disable();
-    //power_timer3_disable();
-    //power_usb_disable();  //FIXME: Uncomment for final version!
+    power_usart0_disable();
+    power_usart1_disable();
+    power_usb_disable();  //FIXME: Uncomment for final version!
 
-    //USBCON |= (1 << FRZCLK);              // Freeze the USB Clock              
-    //PLLCSR &= ~(1 << PLLE);               // Disable the USB Clock (PPL) 
-    //USBCON &=  ~(1 << USBE  );            // Disable the USB  
+    USBCON |= (1 << FRZCLK);              // Freeze the USB Clock              
+    PLLCSR &= ~(1 << PLLE);               // Disable the USB Clock (PPL) 
+    USBCON &=  ~(1 << USBE  );            // Disable the USB  
 }
 
 void enableDeepSleep(void *pvParameters){
  for (;;) {
     if(xSemaphoreTake(sleepSemaphore, 0) && beaconCount >= numberOfBeacons){
       Serial.println("Entering deep sleep mode...");
-      vTaskEndScheduler();                  // Stop Scheduler
-      ADCSRA = 0;                           // Disable ADC
       Serial.end();                         // Stop Serial connection
+      vTaskEndScheduler();                  // Stop Scheduler
+      //ADCSRA = 0;                           // Disable ADC
       power_timer0_disable();               // Disable Timer0
       power_timer1_disable();               // Disable Timer1
       power_timer2_disable();               // Disable Timer2
@@ -48,9 +48,6 @@ void enableDeepSleep(void *pvParameters){
       PLLCSR &= ~(1 << PLLE);               // Disable the USB Clock (PPL) 
       USBCON &=  ~(1 << USBE  );            // Disable the USB  
       SMCR = 0;
-      SMCR |= 1;    // enable SLEEP instruction
-      SMCR &= ~ _BV(SM1);  // set bit to 0
-      SMCR &= ~ _BV(SM2);  // set bit to 0
       ACSR |= _BV(ACD);    // Disable analog comparator
       noInterrupts ();
       sleep_enable();
