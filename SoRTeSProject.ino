@@ -37,8 +37,7 @@ typedef struct {
 int beaconCount = 0; // Keep track of received number of beacons
 int numberOfBeacons = 20;
 
-const byte interruptPin = 2;
-volatile byte state = LOW;
+
 byte adcsra_buf = ADCSRA;
 uint16_t temp_buf = 0;
 bool listenSerialActive = true;
@@ -93,11 +92,13 @@ void setup() {
   // Power mgmt setup
   //pinMode(interruptPin, INPUT_PULLUP);
   //attachInterrupt(digitalPinToInterrupt(interruptPin), wakeUpFromDeepSleep, CHANGE);
+
   enableLowPower();
 
-  
+  delay(2000);
   // Create database
   xSemaphoreGive(dbSemaphore);
+  initDb();
 
   // Discard first temperature read
   adc_read_temp();

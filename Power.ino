@@ -13,7 +13,6 @@ void enableLowPower() {
 
 void enableLowPowerNoSerial() {
       Serial.println("Enabling LowPowerNoSerial");
-      delay(2000);
       vTaskSuspend(readSerialHandle);
       listenSerialActive = false;
       Serial.end();
@@ -22,7 +21,7 @@ void enableLowPowerNoSerial() {
       power_usb_disable();  //FIXME: Uncomment for final version!
     
       USBCON |= (1 << FRZCLK);              // Freeze the USB Clock
-      PLLCSR &= ~(1 << PLLE);               // Disable the USB Clock (PPL)
+      PLLCSR &= ~(1 << PLLE);               // Disable the USB Clock (PLL)
       USBCON &=  ~(1 << USBE  );            // Disable the USB
 }
 

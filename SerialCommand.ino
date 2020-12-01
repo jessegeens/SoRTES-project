@@ -13,6 +13,16 @@ void ReadSerialCommand(void *pvParameters){
         // enable low power operation mode
         beaconCount = numberOfBeacons;
         xSemaphoreGive(sleepSemaphore);
+      } else if (option == '4'){ 
+        clearDb();
+      } else if (option == '5'){ 
+        Serial.println("---------------------");
+        Serial.println("DEBUGGING INFORMATION");
+        Serial.println("---------------------");
+        Serial.print("beaconCount:  "); Serial.println(beaconCount);
+        Serial.print("db.curr_addr: "); Serial.println(curr_addr);
+        Serial.print("db.counter:   "); Serial.println(counter);
+        Serial.println("---------------------");
       } 
     }
     vTaskDelay(500/portTICK_PERIOD_MS);
