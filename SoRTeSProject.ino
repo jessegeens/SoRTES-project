@@ -1,13 +1,11 @@
 #include <SPI.h>
 #include <LoRa.h>
 #include <Arduino_FreeRTOS.h>
-#include <EDB.h>
 #include <EEPROM.h>
 #include <semphr.h>
 #include <avr/sleep.h>
 #include <avr/power.h>
 #include <avr/wdt.h>
-
 
 /* * * * * * * * * * * * * * * * * * 
  *     CONFIGURATION SETTINGS
@@ -36,10 +34,8 @@ typedef struct {
   uint16_t temperature;
 } TempEvent;
 
-EDB db(&writer, &reader); // Create an EDB object with the appropriate write and read handlers
-
 int beaconCount = 0; // Keep track of received number of beacons
-int numberOfBeacons = 3;
+int numberOfBeacons = 20;
 
 const byte interruptPin = 2;
 volatile byte state = LOW;
@@ -97,12 +93,11 @@ void setup() {
   // Power mgmt setup
   //pinMode(interruptPin, INPUT_PULLUP);
   //attachInterrupt(digitalPinToInterrupt(interruptPin), wakeUpFromDeepSleep, CHANGE);
-  //enableLowPower();
+  enableLowPower();
 
   
   // Create database
   xSemaphoreGive(dbSemaphore);
-  db.create(0, TABLE_SIZE, sizeof(TempEvent));
 
   // Discard first temperature read
   adc_read_temp();

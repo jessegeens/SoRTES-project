@@ -5,7 +5,7 @@ void ReadSerialCommand(void *pvParameters){
       option = (char)Serial.read();
       if (option == '1'){
         // read the latest temperature value and beacon details fromdatabase
-        printOneToSerial(db.count());
+        printLatest();
       } else if (option == '2'){
         // read all temperature values and beacon details from database
         printAllToSerial();

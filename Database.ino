@@ -1,13 +1,17 @@
 /* * * * * * * * * * * * * * * * * * 
  *          DATABASE
  * * * * * * * * * * * * * * * * * */
+// Initial address
+int curr_addr = 1;
+int counter = 0;
 
-void writer(unsigned long address, byte data){
-  EEPROM.put(address, data);
-}
-
-byte reader(unsigned long address){
-  return EEPROM.read(address);  
+/***** LAYOUT ****
+| 0               | 1           | 2         | ... | 21
+| curr_addr | counter | temp0 | ... | temp19
+*/
+void initDb(){
+    EEPROM.get(0, curr_addr);
+    EEPROM.get(1, counter);
 }
 
 void writeToDb(TempEvent ev){
@@ -15,19 +19,25 @@ void writeToDb(TempEvent ev){
   xSemaphoreTake(dbSemaphore, ( TickType_t ) 10 );
    
   // Write (critical section)
-  db.appendRec(EDB_REC ev);
+   EEPROM.put(curr_addr,ev); 
+   if (counter < numberOfBeacons){
+    counter++;
+    EEPROM.put(1, counter);
+   }
+   curr_addr = (curr_addr + 1) % numberOfBeacons + 1;
+   EEPROM.put(0, curr_addr);
+   
   
   // Give semaphore
    xSemaphoreGive(dbSemaphore);
 }
 
-void printOneToSerial(int id){
-  if (id <= db.count() && id > 0){
+void printLatest(){
+  if (counter > 0){
     TempEvent ev;
-    db.readRec(id, EDB_REC ev);
+    EEPROM.get(curr_addr - 1, ev);
     Serial.println("ID  Sleep Temp");
-    Serial.print(id); Serial.print("  ");
-    //Serial.print(ev.beaconId); Serial.print("  ");
+    Serial.print(counter); Serial.print("  ");
     Serial.print(ev.sleepTime); Serial.print("    ");
     Serial.println(ev.temperature);
   } else {
@@ -36,17 +46,15 @@ void printOneToSerial(int id){
 }
 
 void printAllToSerial(){
-  int count = db.count();
-  if (count == 0){
+  if (counter == 0){
     Serial.println("No records found");
     return;
   };
   TempEvent ev;
   Serial.println("ID Sleep Temp");
-  for (int recno = 1; recno <= count; recno++){
-    db.readRec(recno, EDB_REC ev);
+  for (int recno = 0; recno <= counter; recno++){
+   EEPROM.get(recno + 2, ev);
     Serial.print(recno); Serial.print("  ");
-   // Serial.print(ev.beaconId); Serial.print("  ");
     Serial.print(ev.sleepTime); Serial.print("    ");
     Serial.println(ev.temperature);
   }
