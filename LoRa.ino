@@ -18,7 +18,7 @@ void LoRaWaitForNext(void *pvParameters){
 void LoRaReceive(int packetSize){
     if (packetSize) {                       // received a packet
       if(listenSerialActive){
-       enableLowPowerNoSerial();
+       //enableLowPowerNoSerial();
       }
       Serial.print("Received packet '");
       String received = "";
@@ -28,16 +28,15 @@ void LoRaReceive(int packetSize){
       int sec = 0;
       if(received.length() == 5){           // Check for the next wake-up time in seconds
         beaconCount++;
-        Serial.println(beaconCount);
         char secChar = received[4];
         sec = secChar - '0'; //Subtract ASCII vals from each other
+
+        xQueueSendFromISR(readTempQueue, &sec, NULL);
+        xQueueSendFromISR(receiveQueue, &sec, NULL);
+        Serial.print(received);      
+        Serial.print("' with RSSI ");
+        Serial.println(LoRa.packetRssi());    // print RSSI of packet
       }
-      
-      xQueueSendFromISR(readTempQueue, &sec, NULL);
-      xQueueSendFromISR(receiveQueue, &sec, NULL);
-      Serial.print(received);      
-      Serial.print("' with RSSI ");
-      Serial.println(LoRa.packetRssi());    // print RSSI of packet
     }
     LoRa.end();
 }

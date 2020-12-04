@@ -50,7 +50,7 @@ void enableDeepSleep(void *pvParameters) {
       //SMCR = 0;
       ACSR |= _BV(ACD);    // Disable analog comparator
       noInterrupts ();
-      portENTER_CRITICAL();
+      //portENTER_CRITICAL();
       sleep_enable();
       set_sleep_mode(SLEEP_MODE_PWR_DOWN);
       sleep_cpu();
