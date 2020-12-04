@@ -16,8 +16,9 @@ void logTemp(void *pvParameters) {
 int adcReadTemp()
 {
 
-    ADCSRA = adcsra_buf;
-    vTaskDelay(20 / portTICK_PERIOD_MS);
+    ADCSRA &= bit (ADEN);
+    delay(20);
+    //vTaskDelay(20 / portTICK_PERIOD_MS);
 
     ADMUX = (1<<REFS1) | (1<<REFS0) | (1<<MUX2) | (1<<MUX1) | (1<<MUX0);
     ADCSRB |= (1<<MUX5);
@@ -38,8 +39,7 @@ int adcReadTemp()
     high = ADCH;
     int a = (high << 8) | low;
 
-    adcsra_buf = ADCSRA;
-    ADCSRA = 0; 
+     ADCSRA &= ~(1<<ADEN);
 
     return a - 236; //Calibrate here
 

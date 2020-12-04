@@ -18,7 +18,7 @@ void LoRaWaitForNext(void *pvParameters){
 void LoRaReceive(int packetSize){
     if (packetSize) {                       // received a packet
       if(listenSerialActive){
-       //enableLowPowerNoSerial();
+       enableLowPowerNoSerial();
       }
       Serial.print("Received packet '");
       String received = "";

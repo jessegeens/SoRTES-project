@@ -33,7 +33,6 @@ void enableDeepSleep(void *pvParameters) {
       vTaskEndScheduler();                  // Stop Scheduler
       ACSR |= _BV(ACD); 
       ADCSRA = 0;                           // Disable ADC
-      //LoRa.sleep();
       power_timer0_disable();               // Disable Timer0
       power_timer1_disable();               // Disable Timer1
       power_timer2_disable();               // Disable Timer2
@@ -47,8 +46,6 @@ void enableDeepSleep(void *pvParameters) {
       USBCON |= (1 << FRZCLK);              // Freeze the USB Clock
       PLLCSR &= ~(1 << PLLE);               // Disable the USB Clock (PPL)
       USBCON &=  ~(1 << USBE  );            // Disable the USB
-      //SMCR = 0;
-      ACSR |= _BV(ACD);    // Disable analog comparator
       noInterrupts ();
       //portENTER_CRITICAL();
       sleep_enable();

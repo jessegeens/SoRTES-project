@@ -31,7 +31,7 @@
 typedef struct {
   //int beaconId;
   int sleepTime;
-  int temperature;
+  uint16_t temperature;
 } TempEvent;
 
 int beaconCount = 0; // Keep track of received number of beacons
@@ -70,12 +70,12 @@ void setup() {
    *
    * Tasks
    * -------------------------------------------------------------------------------------
-   *                    Task                              Human readable name         Stack Parameters  Priority  Handle */
-  xTaskCreate(ReadSerialCommand,  "LoRa Receive",                   128,  NULL,       2,        &readSerialHandle);
-  xTaskCreate(logTemp,                       "Write temp to db",               128,  NULL,       1,        NULL);
-  xTaskCreate(LoRaWaitForNext,        "Wait for next LoRa signal", 128,  NULL,       3,        NULL);
-  xTaskCreate(sendTemp,                    "Send temperature to GW", 128,  NULL,       1,        NULL);
-  xTaskCreate(enableDeepSleep,         "Turn on deep sleep",          128,  NULL,       0,        NULL);
+   *          Task                Human readable name           Stack Parameters  Priority  Handle */
+  xTaskCreate(ReadSerialCommand,  "LoRa Receive",               128,  NULL,       2,        &readSerialHandle);
+  xTaskCreate(logTemp,            "Write temp to db",           128,  NULL,       1,        NULL);
+  xTaskCreate(LoRaWaitForNext,    "Wait for next LoRa signal",  128,  NULL,       3,        NULL);
+  xTaskCreate(sendTemp,           "Send temperature to GW",     128,  NULL,       1,        NULL);
+  xTaskCreate(enableDeepSleep,    "Turn on deep sleep",         128,  NULL,       0,        NULL);
   
   
   //vTaskStartScheduler();
@@ -89,12 +89,17 @@ void setup() {
   receiveQueue = xQueueCreate(2, sizeof(int));
 
   // Power mgmt setup
+  //pinMode(interruptPin, INPUT_PULLUP);
+  //attachInterrupt(digitalPinToInterrupt(interruptPin), wakeUpFromDeepSleep, CHANGE);
+
   enableLowPower();
 
   delay(2000);
   // Create database
   xSemaphoreGive(dbSemaphore);
   initDb();
+
+  Serial.println("Starting..");
 
   // Discard first temperature read
   adcReadTemp();
