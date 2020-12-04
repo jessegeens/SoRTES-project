@@ -13,10 +13,11 @@ void logTemp(void *pvParameters) {
   }
 }
 
-uint16_t adcReadTemp()
+int adcReadTemp()
 {
+
     ADCSRA = adcsra_buf;
-    delay(5);
+    vTaskDelay(20 / portTICK_PERIOD_MS);
 
     ADMUX = (1<<REFS1) | (1<<REFS0) | (1<<MUX2) | (1<<MUX1) | (1<<MUX0);
     ADCSRB |= (1<<MUX5);
@@ -35,9 +36,8 @@ uint16_t adcReadTemp()
     while (ADCSRA & bit(ADSC));
     low  = ADCL;
     high = ADCH;
-    uint16_t a = (high << 8) | low;
+    int a = (high << 8) | low;
 
-    // Turn off ADC
     adcsra_buf = ADCSRA;
     ADCSRA = 0; 
 

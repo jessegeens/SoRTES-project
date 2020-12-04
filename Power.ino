@@ -1,6 +1,6 @@
 void enableLowPower() {
-  ADCSRA = 0;               // Turn of ADC
-  ACSR |= _BV(ACD);    // Disable analog comparator
+  //ADCSRA = 0;               // Turn of ADC
+  //ACSR |= _BV(ACD);    // Disable analog comparator
   wdt_disable();            // Disable Watchdog Timer
   power_timer1_disable();               // Disable Timer1
   power_timer2_disable();
@@ -13,7 +13,6 @@ void enableLowPower() {
 
 void enableLowPowerNoSerial() {
       Serial.println("Enabling LowPowerNoSerial");
-      delay(2000);
       vTaskSuspend(readSerialHandle);
       listenSerialActive = false;
       Serial.end();
@@ -22,7 +21,7 @@ void enableLowPowerNoSerial() {
       power_usb_disable();  //FIXME: Uncomment for final version!
     
       USBCON |= (1 << FRZCLK);              // Freeze the USB Clock
-      PLLCSR &= ~(1 << PLLE);               // Disable the USB Clock (PPL)
+      PLLCSR &= ~(1 << PLLE);               // Disable the USB Clock (PLL)
       USBCON &=  ~(1 << USBE  );            // Disable the USB
 }
 
@@ -32,7 +31,8 @@ void enableDeepSleep(void *pvParameters) {
       Serial.println("Entering deep sleep mode...");
       Serial.end();                         // Stop Serial connection
       vTaskEndScheduler();                  // Stop Scheduler
-      //ADCSRA = 0;                           // Disable ADC
+      ACSR |= _BV(ACD); 
+      ADCSRA = 0;                           // Disable ADC
       //LoRa.sleep();
       power_timer0_disable();               // Disable Timer0
       power_timer1_disable();               // Disable Timer1
